@@ -1,3 +1,11 @@
+name: Validación y despliegue del módulo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resource_group/**'
+
 jobs:
   validate-and-release:
     runs-on: ubuntu-latest
@@ -11,7 +19,7 @@ jobs:
         with:
           terraform_version: 1.6.6
 
-      - name: Terraform Init (sin backend)
+      - name: Init (sin backend)
         working-directory: resource_group
         run: terraform init -backend=false
 
