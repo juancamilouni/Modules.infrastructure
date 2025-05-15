@@ -5,12 +5,12 @@ resource "azurerm_policy_definition" "restrict_locations" {
   display_name = "Allow only specific locations"
 
   policy_rule = jsonencode({
-    "if": {
-      "field": "location",
-      "notIn": ["eastus", "centralus"]
+    "if" : {
+      "field" : "location",
+      "notIn" : ["eastus", "centralus"]
     },
-    "then": {
-      "effect": "deny"
+    "then" : {
+      "effect" : "deny"
     }
   })
 }

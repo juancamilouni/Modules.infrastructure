@@ -25,8 +25,8 @@ resource "azurerm_virtual_network_gateway" "vpn_gateway" {
   }
 
   vpn_client_configuration {
-    address_space         = ["172.16.0.0/24"]
-    vpn_client_protocols  = ["OpenVPN"]
+    address_space        = ["172.16.0.0/24"]
+    vpn_client_protocols = ["OpenVPN"]
   }
 
   tags = var.tags

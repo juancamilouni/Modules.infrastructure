@@ -11,20 +11,20 @@ resource "azurerm_policy_definition" "enforce_tagging" {
   management_group_id = azurerm_management_group.root.id
 
   policy_rule = jsonencode({
-    "if": {
-      "anyOf": [
+    "if" : {
+      "anyOf" : [
         {
-          "field": "tags['Environment']",
-          "exists": false
+          "field" : "tags['Environment']",
+          "exists" : false
         },
         {
-          "field": "tags['Owner']",
-          "exists": false
+          "field" : "tags['Owner']",
+          "exists" : false
         }
       ]
     },
-    "then": {
-      "effect": "deny"
+    "then" : {
+      "effect" : "deny"
     }
   })
 

@@ -22,7 +22,7 @@ resource "azurerm_linux_virtual_machine" "cej0011" {
   custom_data         = var.custom_data
 
 
-  network_interface_ids = [azurerm_network_interface.cej0011_nic.id]
+  network_interface_ids           = [azurerm_network_interface.cej0011_nic.id]
   disable_password_authentication = true
   encryption_at_host_enabled      = true # Cifra los discos directamente desde el host
 
