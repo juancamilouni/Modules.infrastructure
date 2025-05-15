@@ -1,10 +1,8 @@
-name: Validación y despliegue del módulo
+name: Terraform Módulo CI
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'resource_group/**'
+    branches: [main]  # Puedes cambiar a tu rama principal
 
 jobs:
   validate-and-release:
@@ -47,3 +45,8 @@ jobs:
           repository: juancamilouni/TerragruntCvu
           event-type: deploy-resource-group
           client-payload: '{"version": "${{ steps.tagging.outputs.version }}"}'
+
+
+
+
+
