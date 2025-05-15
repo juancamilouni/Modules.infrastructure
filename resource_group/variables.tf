@@ -24,7 +24,8 @@ variable "container_name" {
 }
 
 variable "tags" {
-  description = "Etiquetas para resource group"
-  type        = map(string)
-  default     = {}
+  type = map(string)
+  default = {
+    environment = "dev"
+  }
 }
