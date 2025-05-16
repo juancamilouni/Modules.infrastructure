@@ -6,22 +6,11 @@ on:
 jobs:
   tag-and-notify:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
-
-      - name: Mostrar repositorio actual
-        run: echo "🧾 Repositorio actual: ${{ github.repository }}"
-
-      - name: Validar secreto GH_PUSH_TOKEN
-        run: |
-          if [ -z "${{ secrets.GH_PUSH_TOKEN }}" ]; then
-            echo "❌ El secreto GH_PUSH_TOKEN no está definido."
-            exit 1
-          else
-            echo "✅ GH_PUSH_TOKEN detectado correctamente."
-          fi
 
       - name: Detectar último módulo modificado
         id: detectar
@@ -32,7 +21,7 @@ jobs:
           echo "BASE_SHA=$BASE_SHA"
           echo "HEAD_SHA=$HEAD_SHA"
           if [ -z "$BASE_SHA" ]; then
-            echo "❌ No se pudo determinar el commit base. Abortando."
+            echo "No se pudo determinar el commit base. Abortando."
             exit 1
           fi
           MODULO=$(git diff --name-only $BASE_SHA $HEAD_SHA | cut -d/ -f1 | grep -v '^\.github$' | head -n1)
@@ -40,8 +29,13 @@ jobs:
             echo "❌ No se detectó ningún módulo modificado."
             exit 1
           fi
-          echo "✅ Último módulo detectado: $MODULO"
+          echo "Último módulo detectado: $MODULO"
           echo "modulo=$MODULO" >> $GITHUB_OUTPUT
+
+      - name: Mostrar variables para depuración
+        run: |
+          echo "📦 Repositorio: ${{ github.repository }}"
+          echo "🔖 Tag propuesto: ${{ steps.detectar.outputs.modulo }}-v0.0.${{ github.run_number }}"
 
       - name: Configurar Git
         run: |
@@ -53,19 +47,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
         run: |
           VERSION="${{ steps.detectar.outputs.modulo }}-v0.0.${{ github.run_number }}"
-          echo "🏷️ Creando tag: $VERSION"
-          
           git tag $VERSION
-          echo "🔐 Configurando acceso autenticado"
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-
-          echo "🔄 Verificando remote actual:"
           git remote -v
-
-          echo "🚀 Pushing tag al repositorio..."
           git push origin $VERSION
-
-          echo "✅ Tag creado exitosamente: $VERSION"
+          echo "Tag creado: $VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Notificar a Terragrunt
@@ -74,8 +60,4 @@ jobs:
           token: ${{ secrets.PAT_TERRAGRUNT }}
           repository: juancamilouni/terragrunt-infra
           event-type: deploy-module
-          client-payload: |
-            {
-              "version": "${{ env.version }}"
-            }
-y
+          client-payload: '{"module": "${{ steps.detectar.outputs.modulo }}", "version": "${{ env.version }}"}'
