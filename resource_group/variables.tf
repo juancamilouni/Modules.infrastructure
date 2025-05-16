@@ -24,7 +24,7 @@ variable "container_name" {
 }
 
 variable "tags" {
-  description = "Etiqsasesource group"
+  description = "Etiqsesource group"
   type        = map(string)
   default     = {}
 }
