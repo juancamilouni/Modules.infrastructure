@@ -75,4 +75,7 @@ jobs:
           token: ${{ secrets.PAT_TERRAGRUNT }}
           repository: juancamilouni/terragrunt-infra
           event-type: deploy-module
-          client-payload: '{"version": "${{ env.version }}"}'
+          client-payload: |
+            {
+              "version": "${{ env.version }}"
+            }
