@@ -26,8 +26,8 @@ jobs:
       - name: Detectar módulos modificados
         id: modulos
         run: |
-          git fetch origin main
-          MODULOS=$(git diff --name-only origin/main...HEAD | cut -d/ -f1 | sort -u | grep -v '^\.github$')
+          BASE_REF=$(git merge-base HEAD HEAD^)
+          MODULOS=$(git diff --name-only $BASE_REF HEAD | cut -d/ -f1 | sort -u | grep -v '^\\.github$')
           echo "Módulos detectados: $MODULOS"
           echo "modulos=$MODULOS" >> $GITHUB_OUTPUT
 
