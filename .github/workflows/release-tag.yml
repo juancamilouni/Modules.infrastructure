@@ -37,14 +37,14 @@ jobs:
           echo "Último módulo detectado: $MODULO"
           echo "modulo=$MODULO" >> $GITHUB_OUTPUT
 
-      - name: Crear y subir tag
+      - name: Crear y subir tag (con token directo para prueba)
         run: |
           VERSION="${{ steps.detectar.outputs.modulo }}-v0.0.${{ github.run_number }}"
           echo "🏷️ Creando tag: $VERSION"
           git tag $VERSION
 
           echo "🔐 Configurando acceso autenticado"
-           git remote set-url origin https://x-access-token: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@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token: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@github.com/${{ github.repository }}.git
 
           echo "🔄 Verificando remote actual:"
           git remote -v
