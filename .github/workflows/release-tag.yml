@@ -39,8 +39,8 @@ jobs:
 
       - name: Configurar Git
         run: |
-          git config user.name "ci-bot"
-          git config user.email "ci-bot@example.com"
+          git config user.name "juan uni"
+          git config user.email "sher21camilo@gmail.com"
 
       - name: Crear y subir tag
         env:
