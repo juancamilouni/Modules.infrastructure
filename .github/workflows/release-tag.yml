@@ -38,15 +38,13 @@ jobs:
           echo "modulo=$MODULO" >> $GITHUB_OUTPUT
 
       - name: Crear y subir tag
-        env:
-          GH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
         run: |
           VERSION="${{ steps.detectar.outputs.modulo }}-v0.0.${{ github.run_number }}"
           echo "🏷️ Creando tag: $VERSION"
           git tag $VERSION
 
           echo "🔐 Configurando acceso autenticado"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PUSH_TOKEN }}@github.com/${{ github.repository }}.git
 
           echo "🔄 Verificando remote actual:"
           git remote -v
