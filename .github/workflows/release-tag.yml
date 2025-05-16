@@ -44,7 +44,7 @@ jobs:
           git tag $VERSION
 
           echo "🔐 Configurando acceso autenticado"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PUSH_TOKEN }}@github.com/${{ github.repository }}.git
+           git remote set-url origin https://x-access-token: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@github.com/${{ github.repository }}.git
 
           echo "🔄 Verificando remote actual:"
           git remote -v
