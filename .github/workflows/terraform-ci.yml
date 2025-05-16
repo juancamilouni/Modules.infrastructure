@@ -1,56 +1,46 @@
-name: Terraform Módulo CI
+name: Validación CI de Módulos Terraform
 
 on:
   push:
-    branches: [main]  # Puedes cambiar a tu rama principal
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  validate-and-release:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del código
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
+      - name: Instalar Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
-      - name: Init (sin backend)
-        working-directory: resource_group
-        run: terraform init -backend=false
-
-      - name: Validar sintaxis
-        working-directory: resource_group
-        run: terraform validate
-
-      - name: Formato Terraform (fmt)
-        run: terraform fmt -check -recursive
-        
-      - name: Crear TAG automático
-        id: tagging
-        env:
-          GH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
+      - name: Instalar TFLint
         run: |
-          VERSION="resource_group-v0.0.${{ github.run_number }}"
-          git config user.name "github-actions"
-          git config user.email "ci@example.com"
-          git tag $VERSION
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-          git push origin $VERSION
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
+      - name: Detectar módulos modificados
+        id: modulos
+        run: |
+          git fetch origin main
+          MODULOS=$(git diff --name-only origin/main...HEAD | cut -d/ -f1 | sort -u | grep -v '^\.github$')
+          echo "Módulos detectados: $MODULOS"
+          echo "modulos=$MODULOS" >> $GITHUB_OUTPUT
 
-      - name: Disparar deploy remoto en Terragrunt
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.PAT_TERRAGRUNT }}
-          repository: juancamilouni/TerragruntCvu
-          event-type: deploy-resource-group
-          client-payload: '{"version": "${{ steps.tagging.outputs.version }}"}'
-
-
-
-
-
+      - name: Validar cada módulo cambiado
+        if: steps.modulos.outputs.modulos != ''
+        run: |
+          for dir in ${{ steps.modulos.outputs.modulos }}; do
+            echo "\n🔍 Validando módulo: $dir"
+            cd $dir
+            terraform init -backend=false
+            terraform validate
+            terraform fmt -check -recursive
+            tflint --init
+            tflint
+            cd -
+          done
