@@ -26,22 +26,30 @@ jobs:
       - name: Detectar módulos modificados
         id: modulos
         run: |
+          BASE_SHA=""
+          HEAD_SHA=""
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-              BASE_SHA="${{ github.event.pull_request.base.sha }}"
-              HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
           else
-              BASE_SHA=$(git rev-parse HEAD^)
-              HEAD_SHA=$(git rev-parse HEAD)
+            git fetch --depth=2 origin ${{ github.ref_name }} || true
+            BASE_SHA=$(git rev-parse HEAD^ || echo "")
+            HEAD_SHA=$(git rev-parse HEAD)
           fi
-        
+
           echo "BASE_SHA=$BASE_SHA"
           echo "HEAD_SHA=$HEAD_SHA"
-        
-          MODULOS=$(git diff --name-only $BASE_SHA $HEAD_SHA | cut -d/ -f1 | sort -u | grep -v '^\\.github$')
-        
+
+          if [ -z "$BASE_SHA" ]; then
+            echo "No se pudo determinar el commit base. Ejecutando validación completa."
+            MODULOS=$(find . -maxdepth 1 -type d ! -name "." ! -name ".github" -exec basename {} \;)
+          else
+            MODULOS=$(git diff --name-only $BASE_SHA $HEAD_SHA | cut -d/ -f1 | sort -u | grep -v '^\.github$')
+          fi
+
           echo "Módulos detectados: $MODULOS"
-          echo \"modulos=$MODULOS\" >> $GITHUB_OUTPUT
-        
+          echo "modulos=$MODULOS" >> $GITHUB_OUTPUT
 
       - name: Validar cada módulo cambiado
         if: steps.modulos.outputs.modulos != ''
