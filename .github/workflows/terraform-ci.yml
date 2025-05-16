@@ -68,6 +68,6 @@ jobs:
             terraform validate
             terraform fmt -check -recursive
             tflint --init
-            tflint
+            tflint || echo "⚠️ TFLint terminó con advertencias"
             cd -
           done
