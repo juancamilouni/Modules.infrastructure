@@ -37,19 +37,24 @@ jobs:
           echo "Último módulo detectado: $MODULO"
           echo "modulo=$MODULO" >> $GITHUB_OUTPUT
 
-      - name: Configurar Git
-        run: |
-          git config user.name "ci-bot"
-          git config user.email "ci-bot@example.com"
-
       - name: Crear y subir tag
         env:
           GH_TOKEN: ${{ secrets.GH_PUSH_TOKEN }}
         run: |
           VERSION="${{ steps.detectar.outputs.modulo }}-v0.0.${{ github.run_number }}"
+          echo "🏷️ Creando tag: $VERSION"
           git tag $VERSION
+
+          echo "🔐 Configurando acceso autenticado"
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+
+          echo "🔄 Verificando remote actual:"
+          git remote -v
+
+          echo "🚀 Pushing tag al repositorio..."
           git push origin $VERSION
+
+          echo "✅ Tag subido correctamente: $VERSION"
           echo "version=$VERSION" >> $GITHUB_ENV
 
       - name: Notificar a Terragrunt
