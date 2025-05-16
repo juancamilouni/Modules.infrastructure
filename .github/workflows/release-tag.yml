@@ -6,7 +6,6 @@ on:
 jobs:
   tag-and-notify:
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       - name: Checkout del repositorio
@@ -79,3 +78,4 @@ jobs:
             {
               "version": "${{ env.version }}"
             }
+y
