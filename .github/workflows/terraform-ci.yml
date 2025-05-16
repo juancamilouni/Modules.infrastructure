@@ -26,10 +26,22 @@ jobs:
       - name: Detectar módulos modificados
         id: modulos
         run: |
-          BASE_REF=$(git merge-base HEAD HEAD^)
-          MODULOS=$(git diff --name-only $BASE_REF HEAD | cut -d/ -f1 | sort -u | grep -v '^\\.github$')
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+              BASE_SHA="${{ github.event.pull_request.base.sha }}"
+              HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+              BASE_SHA=$(git rev-parse HEAD^)
+              HEAD_SHA=$(git rev-parse HEAD)
+          fi
+        
+          echo "BASE_SHA=$BASE_SHA"
+          echo "HEAD_SHA=$HEAD_SHA"
+        
+          MODULOS=$(git diff --name-only $BASE_SHA $HEAD_SHA | cut -d/ -f1 | sort -u | grep -v '^\\.github$')
+        
           echo "Módulos detectados: $MODULOS"
-          echo "modulos=$MODULOS" >> $GITHUB_OUTPUT
+          echo \"modulos=$MODULOS\" >> $GITHUB_OUTPUT
+        
 
       - name: Validar cada módulo cambiado
         if: steps.modulos.outputs.modulos != ''
