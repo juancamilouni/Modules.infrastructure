@@ -23,7 +23,8 @@ variable "container_name" {
   type        = string
 }
 
-variable "tag" {
-  type    = string
-  default = "v0.0.1" # 🔄 cambia esto a "v0.0.2"
+variable "tags" {
+  description = "Etiquetas para resource group"
+  type        = map(string)
+  default     = {}
 }
