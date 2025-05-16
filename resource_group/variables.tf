@@ -23,8 +23,9 @@ variable "container_name" {
   type        = string
 }
 
-variable "tags" {
-  description = "Etiqsesource group"
-  type        = map(string)
-  default     = {}
+# resource_group/variables.tf
+
+variable "tag" {
+  type    = string
+  default = "v0.0.3" # Cambia a v0.0.4
 }
