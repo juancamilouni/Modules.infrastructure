@@ -48,7 +48,7 @@ jobs:
             set +e
             DIFF_OUTPUT=$(git diff --name-only $BASE_SHA $HEAD_SHA 2>&1)
             if [ $? -ne 0 ]; then
-              echo "❌ Error en git diff:"
+              echo " Error en git diff:"
               echo "$DIFF_OUTPUT"
               exit 1
             fi
@@ -62,7 +62,7 @@ jobs:
         if: steps.modulos.outputs.modulos != ''
         run: |
           for dir in ${{ steps.modulos.outputs.modulos }}; do
-            echo "\n🔍 Validando módulo: $dir"
+            echo "\n Validando módulo: $dir"
             cd $dir
             terraform init -backend=false
             terraform validate
